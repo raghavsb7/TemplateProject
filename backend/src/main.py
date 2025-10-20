@@ -4,10 +4,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-# DB functions
-from models import get_db, DataFetcher
-from schema import UserResponse
-from sqlalchemy.orm import Session
 
 app = FastAPI(root_path='/api')
 
@@ -68,14 +64,3 @@ def query_deep_learning_model(query: str):
     return JSONResponse(
         content = {"message": answer}
     )
-
-@app.get("/users", response_model=list[UserResponse])
-def get_users(db: Session = Depends(get_db)):
-    return DataFetcher.get_users(db)
-
-@app.get("/users/{user_id}", response_model = UserResponse)
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = DataFetcher.get_user(db, user_id)
-    if not user:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND)
-    return user

@@ -1,10 +1,5 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Information from '../components/information'
 import Mean from '../model-cards/mean'
-import Traditional from '../model-cards/traditional'
 import { Card } from "@/components/ui/card"
-
-
 
 function Home() {
     return (
@@ -17,23 +12,9 @@ function Home() {
                 spent all day lounging on his throne. One day, his advisors came to him
                 with a problem: the kingdom was running out of money (insert description)
               </p>
-              <Information />
-              <Tabs defaultValue="mean">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="mean">Mean model</TabsTrigger>
-                  <TabsTrigger value="traditional">Traditional Model</TabsTrigger>
-                </TabsList>
-                <TabsContent value="mean">
-                  <Card className="p-20">
-                    <Mean />
-                  </Card>
-                </TabsContent>
-                <TabsContent value="traditional">
-                  <Card className="p-20">
-                    <Traditional />
-                  </Card>
-                </TabsContent>
-              </Tabs>
+              <Card className="p-20">
+                <Mean />
+              </Card>
             </div>
     );
   }

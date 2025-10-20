@@ -5,7 +5,7 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # Copy requirements.txt to the container
-COPY src/requirements.txt .
+COPY requirements.txt .
 
 # Install required build dependencies
 RUN apt-get update && apt-get install -y \

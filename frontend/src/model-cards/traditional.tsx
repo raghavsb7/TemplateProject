@@ -5,6 +5,7 @@ const Traditional = () => {
 
     const handlePromptInput = async() => {
         const response = await backendClient.get("/error");
+        console.log(response);
     }
 
     return (
