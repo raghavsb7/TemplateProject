@@ -4,6 +4,7 @@ from sqlalchemy.sql import func
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from enum import Enum
+from typing import Optional
 import enum
 
 Base = declarative_base()
@@ -105,32 +106,32 @@ class UserResponse(BaseModel):
 
 class TaskCreate(BaseModel):
     title: str
-    description: str | None = None
+    description: Optional[str] = None
     task_type: TaskType
-    due_date: datetime | None = None
-    start_date: datetime | None = None
+    due_date: Optional[datetime] = None
+    start_date: Optional[datetime] = None
     priority: int = 0
 
 class TaskUpdate(BaseModel):
-    status: TaskStatus | None = None
-    title: str | None = None
-    description: str | None = None
-    priority: int | None = None
+    status: Optional[TaskStatus] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[int] = None
 
 class TaskResponse(BaseModel):
     id: int
     user_id: int
     title: str
-    description: str | None
+    description: Optional[str]
     task_type: TaskType
     status: TaskStatus
     source_type: SourceType
-    source_id: str | None
-    due_date: datetime | None
-    start_date: datetime | None
+    source_id: Optional[str]
+    due_date: Optional[datetime]
+    start_date: Optional[datetime]
     priority: int
     created_at: datetime
-    updated_at: datetime | None
+    updated_at: Optional[datetime]
 
     class Config:
         from_attributes = True
@@ -139,14 +140,14 @@ class TaskResponse(BaseModel):
 class OAuthTokenCreate(BaseModel):
     source_type: SourceType
     access_token: str
-    refresh_token: str | None = None
-    expires_at: datetime | None = None
+    refresh_token: Optional[str] = None
+    expires_at: Optional[datetime] = None
 
 class OAuthTokenResponse(BaseModel):
     id: int
     user_id: int
     source_type: SourceType
-    expires_at: datetime | None
+    expires_at: Optional[datetime]
     created_at: datetime
 
     class Config:

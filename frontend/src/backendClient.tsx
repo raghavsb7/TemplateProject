@@ -6,7 +6,8 @@ const apiURL = import.meta.env.VITE_API_ENDPOINT;
 log("apiURL : ", apiURL);
 
 const backendClient = axios.create({
-    baseURL: apiURL
+    baseURL: apiURL,
+    timeout: 10000, // 10 second timeout
 });
 
 backendClient.interceptors.response.use(
@@ -19,7 +20,8 @@ backendClient.interceptors.response.use(
         log("API error:", { status, message });
         
         globalStore.getState().setError(message);
-        return Promise.resolve({ data: null, error: { message } });
+        // Reject the promise so components can handle errors properly
+        return Promise.reject(error);
     }
   );
 

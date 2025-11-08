@@ -161,6 +161,62 @@ async def get_oauth_tokens(user_id: int = Query(...), db: Session = Depends(get_
     return user.tokens
 
 
+@app.post("/auth/canvas/token")
+async def add_canvas_token(
+    user_id: int = Query(...),
+    access_token: str = Query(...),
+    canvas_base_url: str = Query(None),
+    db: Session = Depends(get_db)
+):
+    """Add Canvas API token manually (for users without admin access)"""
+    try:
+        # Verify user exists
+        user = DataFetcher.get_user(db, user_id)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Use provided base URL or default
+        base_url = canvas_base_url or os.getenv("CANVAS_BASE_URL", "https://canvas.instructure.com")
+        
+        # Verify token works by making a test API call
+        import httpx
+        async with httpx.AsyncClient() as client:
+            test_response = await client.get(
+                f"{base_url}/api/v1/users/self",
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10.0
+            )
+            if test_response.status_code != 200:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid Canvas token. Error: {test_response.text[:200]}"
+                )
+        
+        # Store token (API tokens don't expire, so set expires_at to None)
+        token = DataFetcher.upsert_oauth_token(
+            db, user_id, SourceType.CANVAS,
+            access_token,
+            None,  # No refresh token for API tokens
+            None   # API tokens don't expire
+        )
+        
+        # Sync tasks immediately
+        try:
+            await IntegrationManager.sync_user_tasks(user_id, db, SourceType.CANVAS)
+        except Exception as e:
+            print(f"Error syncing tasks after adding token: {e}")
+        
+        return JSONResponse(content={
+            "message": "Canvas token added successfully",
+            "token_id": token.id,
+            "source": "canvas"
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error adding Canvas token: {str(e)}")
+
+
 # Tasks
 @app.get("/tasks", response_model=TaskSummary)
 async def get_tasks(
